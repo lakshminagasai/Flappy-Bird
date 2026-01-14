@@ -1,0 +1,27 @@
+
+# .gitignore at repo root
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+flappy310/
+.venv/
+.vscode/
+logs_bird/
+saved_networks/
+*.png
+*.gif
+*.jpg
+\
+
+# VS Code
+.vscode/
+
+# TensorFlow / logs
+logs_bird/
+saved_networks/
+
+# Images / outputs (optional)
+*.png
+*.gif
+*.jpg
