@@ -1,75 +1,124 @@
-# Using Deep Q-Network to Learn How To Play Flappy Bird
+# Deep Q-Network AI for Flappy Bird
 
 <img src="./images/flappy_bird_demp.gif" width="250">
 
+Train an AI agent to play **Flappy Bird** using **Deep Q-Learning**. This project demonstrates how a convolutional neural network can learn to play a game directly from pixel input using reinforcement learning.
+
+---
+
 ## Overview
-This project follows the description of the Deep Q Learning algorithm described in Playing Atari with Deep Reinforcement Learning [2] and shows that this learning algorithm can be further generalized to the notorious Flappy Bird.
 
-## Installation Dependencies:
-* Python 2.7 or 3
-* TensorFlow 0.7
-* pygame
-* OpenCV-Python
+This project implements a **Deep Q-Network (DQN)** to train an AI agent to play Flappy Bird. The agent learns by:
 
-## How to Run?
-``
-git clone `https://github.com/lakshminagasai/Flappy-Bird.git
-cd DeepLearningFlappyBird
+1. Observing the game screen (state)  
+2. Making decisions (flap or do nothing)  
+3. Receiving rewards based on survival and passing pipes  
+4. Updating its action-value estimates using a neural network  
+
+The model learns to maximize its total game score over time without any hard-coded rules.
+
+---
+
+## Dependencies
+
+- Python 3.x (recommended)  
+- TensorFlow 0.7 (or compatible version)  
+- pygame  
+- OpenCV-Python  
+
+Install dependencies using pip:
+
+```bash
+pip install tensorflow pygame opencv-python
+How to Run
+bash
+Copy code
+# Clone the repository
+git clone https://github.com/lakshminagasai/Flappy-Bird.git
+cd Flappy-Bird/DeepLearningFlappyBird
+
+# Run the AI agent
 python deep_q_network.py
-```
+Note: Do not include the virtual environment (flappy310/) in the repository. It is excluded in .gitignore.
 
-## What is Deep Q-Network?
-It is a convolutional neural network, trained with a variant of Q-learning, whose input is raw pixels and whose output is a value function estimating future rewards.
+Deep Q-Network Overview
+A Deep Q-Network (DQN) approximates the Q-function:
 
-## Deep Q-Network Algorithm
+css
+Copy code
+Q(s, a) ≈ expected future rewards given state s and action a
+Input: stacked grayscale frames of the game (80x80x4)
 
-The pseudo-code for the Deep Q Learning algorithm, as given in [1], can be found below:
+Architecture: convolutional layers followed by fully connected layers
 
-```
-Initialize replay memory D to size N
-Initialize action-value function Q with random weights
-for episode = 1, M do
-    Initialize state s_1
-    for t = 1, T do
-        With probability ϵ select random action a_t
-        otherwise select a_t=max_a  Q(s_t,a; θ_i)
-        Execute action a_t in emulator and observe r_t and s_(t+1)
-        Store transition (s_t,a_t,r_t,s_(t+1)) in D
-        Sample a minibatch of transitions (s_j,a_j,r_j,s_(j+1)) from D
-        Set y_j:=
-            r_j for terminal s_(j+1)
-            r_j+γ*max_(a^' )  Q(s_(j+1),a'; θ_i) for non-terminal s_(j+1)
-        Perform a gradient step on (y_j-Q(s_j,a_j; θ_i))^2 with respect to θ
-    end for
-end for
-```
+Output: Q-values for each possible action (flap / do nothing)
 
-## Experiments
+DQN Training Algorithm
+Initialize replay memory and Q-network with random weights.
 
-#### Environment
-Since deep Q-network is trained on the raw pixel values observed from the game screen at each time step, [3] finds that remove the background appeared in the original game can make it converge faster. This process can be visualized as the following figure:
+For each episode:
 
-<img src="./images/preprocess.png" width="450">
+Choose actions using an ϵ-greedy policy
 
-#### Network Architecture
-According to [1], I first preprocessed the game screens with following steps:
+Store transitions (state, action, reward, next_state) in replay memory
 
-1. Convert image to grayscale
-2. Resize image to 80x80
-3. Stack last 4 frames to produce an 80x80x4 input array for network
+Sample minibatches of experiences to update the network using:
 
-The architecture of the network is shown in the figure below. The first layer convolves the input image with an 8x8x4x32 kernel at a stride size of 4. The output is then put through a 2x2 max pooling layer. The second layer convolves with a 4x4x32x64 kernel at a stride of 2. We then max pool again. The third layer convolves with a 3x3x64x64 kernel at a stride of 1. We then max pool one more time. The last hidden layer consists of 256 fully connected ReLU nodes.
+ini
+Copy code
+Loss = (r + γ * max_a' Q(next_state, a') - Q(state, action))^2
+Linearly anneal ϵ from 0.1 → 0.0001 to reduce random exploration over time.
 
-<img src="./images/network.png">
+Continue training to improve the agent’s performance.
 
-The final output layer has the same dimensionality as the number of valid actions which can be performed in the game, where the 0th index always corresponds to doing nothing. The values at this output layer represent the Q function given the input state for each valid action. At each time step, the network performs whichever action corresponds to the highest Q value using a ϵ greedy policy.
+Preprocessing
+Convert frames to grayscale
 
-## References
+Resize to 80x80 pixels
 
-[1] Mnih Volodymyr, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and Demis Hassabis. **Human-level Control through Deep Reinforcement Learning**. Nature, 529-33, 2015.
+Stack the last 4 frames to provide temporal information
 
-[2] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. **Playing Atari with Deep Reinforcement Learning**. NIPS, Deep Learning workshop
+Remove the background to speed up convergence
 
-[3] Kevin Chen. **Deep Reinforcement Learning for Flappy Bird** [Report](http://cs229.stanford.edu/proj2015/362_report.pdf) | [Youtube result](https://youtu.be/9WKBzTUsPKc)
+Network Architecture
+Conv Layer 1: 8x8 kernel, 32 filters, stride 4 + 2x2 max pooling
 
+Conv Layer 2: 4x4 kernel, 64 filters, stride 2 + 2x2 max pooling
 
+Conv Layer 3: 3x3 kernel, 64 filters, stride 1 + 2x2 max pooling
+
+Fully Connected Layer: 256 ReLU nodes
+
+Output Layer: Q-values for each valid action
+
+<img src="./images/network.png" width="450">
+At each time step, the network selects the action with the highest Q-value, following an ϵ-greedy policy.
+
+Folder Structure
+bash
+Copy code
+Flappy-Bird/
+├─ DeepLearningFlappyBird/   # Project code
+├─ images/                    # Demo images/GIFs
+├─ README.md                  # Project documentation
+├─ .gitignore                 # Ignored files/folders
+Virtual environment (flappy310/) and saved networks (saved_networks/) are ignored.
+
+Notes
+Ensure dependencies are installed in a separate virtual environment.
+
+You can export all dependencies for reproducibility:
+
+bash
+Copy code
+pip freeze > requirements.txt
+To recreate the environment:
+
+bash
+Copy code
+python -m venv env
+source env/bin/activate   # Linux/macOS
+env\Scripts\activate      # Windows
+pip install -r requirements.txt
+Author
+Lakshmi Naga Sai – Designed and implemented this Flappy Bird DQN AI project.
