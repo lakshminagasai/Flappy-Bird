@@ -1,7 +1,5 @@
 # Using Deep Q-Network to Learn How to Play Flappy Bird 🎮
 <img src="./images/flappy_bird_demp.gif" width="250">
-
-
 ## Overview
 
 This project implements a **Deep Q-Network (DQN)** to train an agent to play the Flappy Bird game using **raw pixel inputs**.
