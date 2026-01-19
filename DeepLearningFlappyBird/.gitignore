@@ -10,7 +10,7 @@ flappy310/
 logs_bird/
 saved_networks/
 *.png
-*.gif
+
 *.jpg
 \
 
