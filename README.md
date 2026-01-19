@@ -6,19 +6,14 @@
 
 This project implements a **Deep Q-Network (DQN)** to train an agent to play the Flappy Bird game using **raw pixel inputs**.
 The implementation is inspired by the seminal papers *Playing Atari with Deep Reinforcement Learning* and *Human-level Control through Deep Reinforcement Learning*, demonstrating that DQN can be generalized beyond Atari environments to Flappy Bird.
-
 ---
 
 ## Installation Dependencies
 
-* Python 2.7 or Python 3
-* TensorFlow 0.7
+*  Python 3.10
+* TensorFlow 2.x
 * pygame
-* OpenCV (opencv-python)
-
-> ⚠️ **Note:** This project uses an older TensorFlow version to stay consistent with the original DQN implementation.
-
----
+* OpenCV (opencv-python)-
 
 ## How to Run
 
@@ -27,7 +22,6 @@ git clone https://github.com/lakshminagasai/Flappy-Bird.git
 cd DeepLearningFlappyBird
 python deep_q_network.py
 ```
-
 ---
 
 ## What is a Deep Q-Network?
