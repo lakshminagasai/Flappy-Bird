@@ -6,7 +6,7 @@
 
 This project implements a **Deep Q-Network (DQN)** to train an agent to play the Flappy Bird game using **raw pixel inputs**.
 The implementation is inspired by the seminal papers *Playing Atari with Deep Reinforcement Learning* and *Human-level Control through Deep Reinforcement Learning*, demonstrating that DQN can be generalized beyond Atari environments to Flappy Bird.
----
+
 
 ## Installation Dependencies
 
