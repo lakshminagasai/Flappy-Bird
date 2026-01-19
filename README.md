@@ -1,74 +1,109 @@
-# Using Deep Q-Network to Learn How To Play Flappy Bird
+# Using Deep Q-Network to Learn How to Play Flappy Bird 🐦🎮
 
-<img src="./images/flappy_bird_demp.gif" width="250">
-
+<img src="./images/flappy_bird_demp.gif" width="250" />
 
 ## Overview
-This project follows the description of the Deep Q Learning algorithm described in Playing Atari with Deep Reinforcement Learning [2] and shows that this learning algorithm can be further generalized to the notorious Flappy Bird.
 
-## Installation Dependencies:
-* Python 2.7 or 3
+This project implements a **Deep Q-Network (DQN)** to train an agent to play the Flappy Bird game using **raw pixel inputs**.
+The implementation is inspired by the seminal papers *Playing Atari with Deep Reinforcement Learning* and *Human-level Control through Deep Reinforcement Learning*, demonstrating that DQN can be generalized beyond Atari environments to Flappy Bird.
+
+---
+
+## Installation Dependencies
+
+* Python 2.7 or Python 3
 * TensorFlow 0.7
 * pygame
-* OpenCV-Python
+* OpenCV (opencv-python)
 
-## How to Run?
-```
+> ⚠️ **Note:** This project uses an older TensorFlow version to stay consistent with the original DQN implementation.
+
+---
+
+## How to Run
+
+```bash
 git clone https://github.com/lakshminagasai/Flappy-Bird.git
 cd DeepLearningFlappyBird
 python deep_q_network.py
 ```
 
-## What is Deep Q-Network?
-It is a convolutional neural network, trained with a variant of Q-learning, whose input is raw pixels and whose output is a value function estimating future rewards.
+---
 
+## What is a Deep Q-Network?
+
+A **Deep Q-Network (DQN)** is a convolutional neural network trained using a variant of **Q-learning**.
+
+* **Input:** Raw pixel frames from the game screen
+* **Output:** Q-values representing the expected future reward for each possible action
+
+The agent selects actions using an **ε-greedy policy**, balancing exploration and exploitation.
+
+---
 
 ## Deep Q-Network Algorithm
 
-The pseudo-code for the Deep Q Learning algorithm, as given in [1], can be found below:
+The pseudo-code for the Deep Q-Learning algorithm (from [1]) is shown below:
 
-```
-Initialize replay memory D to size N
-Initialize action-value function Q with random weights
-for episode = 1, M do
-    Initialize state s_1
-    for t = 1, T do
-        With probability ϵ select random action a_t
-        otherwise select a_t=max_a  Q(s_t,a; θ_i)
-        Execute action a_t in emulator and observe r_t and s_(t+1)
-        Store transition (s_t,a_t,r_t,s_(t+1)) in D
-        Sample a minibatch of transitions (s_j,a_j,r_j,s_(j+1)) from D
-        Set y_j:=
-            r_j for terminal s_(j+1)
-            r_j+γ*max_(a^' )  Q(s_(j+1),a'; θ_i) for non-terminal s_(j+1)
-        Perform a gradient step on (y_j-Q(s_j,a_j; θ_i))^2 with respect to θ
+```text
+Initialize replay memory D to capacity N
+Initialize action-value function Q with random weights θ
+
+for episode = 1 to M do
+    Initialize state s₁
+    for t = 1 to T do
+        With probability ε select a random action aₜ
+        otherwise select aₜ = argmaxₐ Q(sₜ, a; θ)
+
+        Execute action aₜ and observe reward rₜ and next state sₜ₊₁
+        Store transition (sₜ, aₜ, rₜ, sₜ₊₁) in D
+
+        Sample a minibatch from replay memory D
+        Compute target:
+            yⱼ = rⱼ (if terminal)
+            yⱼ = rⱼ + γ maxₐ′ Q(sⱼ₊₁, a′; θ) (if non-terminal)
+
+        Perform gradient descent on (yⱼ − Q(sⱼ, aⱼ; θ))²
     end for
 end for
 ```
 
+---
+
 ## Experiments
 
-#### Environment
-Since deep Q-network is trained on the raw pixel values observed from the game screen at each time step, [3] finds that remove the background appeared in the original game can make it converge faster. This process can be visualized as the following figure:
+### Environment
 
-#### Network Architecture
-According to [1], I first preprocessed the game screens with following steps:
+The DQN is trained directly on **pixel-level observations**.
+To speed up convergence, the game background is removed, following the approach in [3].
 
-1. Convert image to grayscale
-2. Resize image to 80x80
-3. Stack last 4 frames to produce an 80x80x4 input array for network
+### Network Architecture
 
-The architecture of the network is shown in the figure below. The first layer convolves the input image with an 8x8x4x32 kernel at a stride size of 4. The output is then put through a 2x2 max pooling layer. The second layer convolves with a 4x4x32x64 kernel at a stride of 2. We then max pool again. The third layer convolves with a 3x3x64x64 kernel at a stride of 1. We then max pool one more time. The last hidden layer consists of 256 fully connected ReLU nodes.
+The preprocessing pipeline:
 
-The final output layer has the same dimensionality as the number of valid actions which can be performed in the game, where the 0th index always corresponds to doing nothing. The values at this output layer represent the Q function given the input state for each valid action. At each time step, the network performs whichever action corresponds to the highest Q value using a ϵ greedy policy.
-`
+1. Convert frames to grayscale
+2. Resize frames to **80 × 80**
+3. Stack the last **4 frames** to form an **80 × 80 × 4** input
+
+**Network Structure:**
+
+* Conv Layer 1: 8×8 kernel, 32 filters, stride 4 → Max Pool
+* Conv Layer 2: 4×4 kernel, 64 filters, stride 2 → Max Pool
+* Conv Layer 3: 3×3 kernel, 64 filters, stride 1 → Max Pool
+* Fully Connected Layer: 256 ReLU units
+* Output Layer: Q-values for each valid action
+
+At each time step, the agent selects the action with the highest Q-value using an ε-greedy strategy.
+
+---
 
 ## References
 
-[1] Mnih Volodymyr, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and Demis Hassabis. **Human-level Control through Deep Reinforcement Learning**. Nature, 529-33, 2015.
+[1] Mnih et al., **Human-level Control through Deep Reinforcement Learning**, *Nature*, 2015.
 
-[2] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. **Playing Atari with Deep Reinforcement Learning**. NIPS, Deep Learning workshop
+[2] Mnih et al., **Playing Atari with Deep Reinforcement Learning**, *NIPS Deep Learning Workshop*.
 
-[3] Kevin Chen. **Deep Reinforcement Learning for Flappy Bird** [Report](http://cs229.stanford.edu/proj2015/362_report.pdf) | [Youtube result](https://youtu.be/9WKBzTUsPKc)
+[3] Kevin Chen, **Deep Reinforcement Learning for Flappy Bird**
 
-
+* [Project Report](http://cs229.stanford.edu/proj2015/362_report.pdf)
+* [YouTube Result](https://youtu.be/9WKBzTUsPKc)
