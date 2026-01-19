@@ -1,6 +1,6 @@
 # Using Deep Q-Network to Learn How to Play Flappy Bird 🐦🎮
 
-<img src="./images/flappy_bird_demp.gif" width="250" />
+<img src="C:\TOURISM WEBSITE\Flappy bird\DeepLearningFlappyBird\images\flappy_bird_demp.gif" width="250" />
 
 ## Overview
 
